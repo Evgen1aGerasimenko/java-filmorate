@@ -7,9 +7,6 @@ import ru.yandex.practicum.filmorate.validators.ReleaseDateConstraint;
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
-/**
- * Film.
- */
 @Data
 @NoArgsConstructor
 public class Film {
