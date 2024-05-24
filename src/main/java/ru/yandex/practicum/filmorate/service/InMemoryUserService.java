@@ -1,20 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class InMemoryUserService implements UserService {
 
-    private UserStorage userStorage;
+    private final UserStorage userStorage;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
@@ -33,6 +34,11 @@ public class InMemoryUserService implements UserService {
     @Override
     public User updateUser(User user) {
         log.info("Получен запрос для изменения данных пользователя" + user.getId());
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new ValidationException("Ошибка изменения данных пользователя. Не задан идентификатор пользователя для обновления.");
+        }
+        userStorage.getUserId(user.getId());
         return userStorage.updateUser(user);
     }
 

@@ -18,7 +18,6 @@ public class FilmStorageTest {
     private Film film;
     private FilmStorage filmStorage;
     private static Validator validator;
-    private UserStorage userStorage;
 
     static {
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -27,7 +26,7 @@ public class FilmStorageTest {
 
     @BeforeEach
     public void beforeEach() {
-        filmStorage = new InMemoryFilmStorage(userStorage);
+        filmStorage = new InMemoryFilmStorage();
         film = new Film();
         film.setName("New film");
         film.setDescription("This film is about ...");

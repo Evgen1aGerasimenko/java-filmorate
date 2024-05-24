@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.*;
@@ -12,7 +11,7 @@ import java.util.stream.Collectors;
 @Component
 @Getter
 public class InMemoryUserStorage implements UserStorage {
-    protected final Map<Long, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
     private long idGenerator = 0L;
 
     @Override
@@ -33,14 +32,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        Long userId = user.getId();
-        if (userId == null) {
-            throw new ValidationException("Ошибка изменения данных пользователя. Не задан идентификатор пользователя для обновления.");
-        }
         User userUpdate = users.get(user.getId());
-        if (users.get(userId) == null) {
-            throw new NotFoundException("Неизвестная ошибка");
-        }
         userUpdate.setName(user.getName());
         userUpdate.setLogin(user.getLogin());
         userUpdate.setEmail(user.getEmail());
