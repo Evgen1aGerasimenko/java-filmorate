@@ -1,22 +1,22 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+
 import java.time.LocalDate;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FilmControllerTest {
+public class FilmStorageTest {
     private Film film;
-    private FilmController filmController;
+    private FilmStorage filmStorage;
     private static Validator validator;
 
     static {
@@ -24,10 +24,9 @@ public class FilmControllerTest {
         validator = validatorFactory.usingContext().getValidator();
     }
 
-
     @BeforeEach
     public void beforeEach() {
-        filmController = new FilmController();
+        filmStorage = new InMemoryFilmStorage();
         film = new Film();
         film.setName("New film");
         film.setDescription("This film is about ...");
@@ -37,28 +36,28 @@ public class FilmControllerTest {
 
     @Test
     void shouldGetAllFilms() {
-        filmController.createFilm(film);
-        assertEquals(1, filmController.getFilms().size(), "Список не должен быть пустым");
+        filmStorage.createFilm(film);
+        assertEquals(1, filmStorage.getFilms().size(), "Список не должен быть пустым");
     }
 
     @Test
     void shouldCreateFilm() {
-        assertEquals(0, filmController.getFilms().size(), "Список должен быть пустым");
-        filmController.createFilm(film);
-        assertEquals(1, filmController.getFilms().size(), "Фильм не был создан");
+        assertEquals(0, filmStorage.getFilms().size(), "Список должен быть пустым");
+        filmStorage.createFilm(film);
+        assertEquals(1, filmStorage.getFilms().size(), "Фильм не был создан");
     }
 
     @Test
-    void shouldUpdateFilm() throws NotFoundException {
-        filmController.createFilm(film);
+    void shouldUpdateFilm() {
+        filmStorage.createFilm(film);
         Film film1 = new Film();
-        film1.setId(1);
+        film1.setId(1L);
         film1.setName("New filmUpdation");
         film1.setDescription("This film is about ...updated");
         film1.setReleaseDate(LocalDate.of(2020, 10, 25));
         film1.setDuration(180);
 
-        filmController.updateFilm(film1);
+        filmStorage.updateFilm(film1);
 
         assertEquals("New filmUpdation", film.getName(), "Имя фильма не обновилось");
         assertEquals("This film is about ...updated", film.getDescription(), "Описание фильма не обновилось");

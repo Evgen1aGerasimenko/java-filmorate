@@ -1,16 +1,21 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validators.ReleaseDateConstraint;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Film {
-    private int id;
+    private Long id;
     @NotBlank
     private String name;
     @Size(min = 0, max = 200)
@@ -19,4 +24,5 @@ public class Film {
     private LocalDate releaseDate;
     @Min(1)
     private int duration;
+    private final Set<Long> likes = new HashSet<>();
 }

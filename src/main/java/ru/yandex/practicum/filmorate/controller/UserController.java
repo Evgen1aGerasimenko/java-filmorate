@@ -1,62 +1,55 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
-import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.HashMap;
+import jakarta.validation.Valid;
+
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Validated
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
-    private final Map<Integer, User> users = new HashMap<>();
-    private int idGenerator = 0;
-    private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+    private final UserService userService;
 
     @GetMapping
     public List<User> getUsers() {
-        log.info("Получен запрос для получения списка всех пользователей");
-        return new ArrayList<>(users.values());
+        return userService.getUsers();
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.info("Получен запрос для создания нового пользователя");
-        int id = ++idGenerator;
-        user.setId(id);
-        users.put(id, user);
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        log.info("Создан новый пользователь" + user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) throws NotFoundException {
-        log.info("Получен запрос для изменения данных пользователя");
-        Integer userId = user.getId();
-        if (userId == null) {
-            throw new ValidationException("Ошибка изменения данных пользователя. Не задан идентификатор пользователя для обновления.");
-        }
-        User userUpdate = users.get(user.getId());
-        if (userUpdate == null) {
-            throw new NotFoundException("Неизвестная ошибка");
-        }
-        userUpdate.setName(user.getName());
-        userUpdate.setLogin(user.getLogin());
-        userUpdate.setEmail(user.getEmail());
-        userUpdate.setBirthday(user.getBirthday());
-        log.info("Данные пользователя изменены" + user);
-        return user;
+    public User updateUser(@Valid @RequestBody User user) {
+        return userService.updateUser(user);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        userService.deleteFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> usersFriends(@PathVariable Long id) {
+        return userService.usersFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> commonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        return userService.commonFriends(id, otherId);
     }
 }
