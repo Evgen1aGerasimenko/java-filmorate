@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@NoArgsConstructor
+@NoArgsConstructor(force = true)
 @AllArgsConstructor
 public class Film {
     private Long id;
@@ -24,5 +24,7 @@ public class Film {
     private LocalDate releaseDate;
     @Min(1)
     private int duration;
-    private final Set<Long> likes = new HashSet<>();
+    private Set<Long> likes = new HashSet<>();
+    private Set<Genres> genres = new HashSet<>();
+    private Mpa mpa;
 }

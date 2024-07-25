@@ -5,9 +5,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.util.List;
 
@@ -15,52 +14,62 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InMemoryUserService implements UserService {
 
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @Override
     public List<User> getUsers() {
         log.info("Получен запрос для получения списка всех пользователей");
-        return userStorage.getUsers();
+        return userRepository.getUsers();
     }
 
     @Override
     public User createUser(User user) {
-        log.info("Получен запрос для создания нового пользователя");
-        return userStorage.createUser(user);
+        log.info("Получен запрос для создания нового пользователя" + user);
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+        return userRepository.createUser(user);
     }
 
     @Override
     public User updateUser(User user) {
-        log.info("Получен запрос для изменения данных пользователя" + user.getId());
-        Long userId = user.getId();
-        if (userId == null) {
-            throw new ValidationException("Ошибка изменения данных пользователя. Не задан идентификатор пользователя для обновления.");
-        }
-        userStorage.getUserId(user.getId());
-        return userStorage.updateUser(user);
+        log.info("Получен запрос для изменения данных пользователя " + user);
+        userRepository.getUserById(user.getId());
+        return userRepository.updateUser(user);
     }
 
     @Override
     public void addFriend(Long id, Long friendId) {
-        userStorage.addFriend(id, friendId);
+        userRepository.getUserById(id);
+        userRepository.getUserById(friendId);
+        userRepository.addFriend(id, friendId);
         log.info("Пользователи " + id + " и " + friendId + " стали друзьями");
     }
 
     @Override
     public void deleteFriend(Long id, Long friendId) {
-        userStorage.deleteFriend(id, friendId);
+        userRepository.getUserById(id);
+        userRepository.getUserById(friendId);
+        userRepository.deleteFriend(id, friendId);
         log.info("Пользователи " + id + " и " + friendId + " больше не друзья");
     }
 
     @Override
     public List<User> usersFriends(Long id) {
-        return userStorage.usersFriends(id);
+        log.info("Получен запрос на получение !списка друзей пользователя с идентификатором - " + id);
+        userRepository.getUserById(id);
+        return userRepository.usersFriends(id);
     }
 
     @Override
     public List<User> commonFriends(Long id, Long otherId) {
-        return userStorage.commonFriends(id, otherId);
+        log.info("Получен запрос на получение !списка общих друзей пользователя с идентификатором - " + id +
+                " и идентификатором - " + otherId);
+        userRepository.getUserById(id);
+        userRepository.getUserById(otherId);
+        return userRepository.commonFriends(id, otherId);
     }
 }
+

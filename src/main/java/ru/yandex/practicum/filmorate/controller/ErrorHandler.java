@@ -5,6 +5,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 
@@ -29,9 +30,18 @@ public class ErrorHandler {
         );
     }
 
+    @ExceptionHandler(ValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse validationExceptions(final Exception e) {
+        return new ErrorResponse(
+                "Произошла ошибка ",
+                e.getMessage()
+        );
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationExceptions(final MethodArgumentNotValidException e) {
+    public ErrorResponse someValidationExceptions(final MethodArgumentNotValidException e) {
         return new ErrorResponse(
                 "Произошла ошибка ",
                 e.getMessage()

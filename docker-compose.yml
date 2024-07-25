@@ -1,0 +1,10 @@
+services:
+  db:
+    image: openjdk
+    container_name: H2
+    ports:
+      - "9092:5432"
+    environment:
+      - FILMORATE_DB=filmorate
+      - FILMORATE_USER=sa
+      - FILMORATE_PASSWORD=password
