@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InMemoryFilmService implements FilmService {
+public class DbFilmService implements FilmService {
     private final FilmRepository filmRepository;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final UserRepository userRepository;

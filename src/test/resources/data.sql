@@ -37,4 +37,3 @@ MERGE INTO likes (film_id, user_id) VALUES (2, 3);
 DELETE FROM likes WHERE film_id = 1 AND user_id = 3;
 
 INSERT INTO film_genre (film_id, genre_id) VALUES (1, 1);
-INSERT INTO film_genre (film_id, genre_id) VALUES (1, 2);

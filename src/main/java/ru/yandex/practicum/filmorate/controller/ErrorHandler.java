@@ -30,18 +30,18 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse validationExceptions(final Exception e) {
+    public ErrorResponse validationExceptions(final MethodArgumentNotValidException e) {
         return new ErrorResponse(
                 "Произошла ошибка ",
                 e.getMessage()
         );
     }
 
-    @ExceptionHandler
+    @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse someValidationExceptions(final MethodArgumentNotValidException e) {
+    public ErrorResponse requestException(final Exception e) {
         return new ErrorResponse(
                 "Произошла ошибка ",
                 e.getMessage()

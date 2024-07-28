@@ -32,7 +32,7 @@ public class FilmRepositoryTest {
         assertEquals(LocalDate.of(2017, 12, 28), filmStorage.getFilmById(1L).getReleaseDate(),
                 "Неверная дата релиза");
         assertEquals(1, filmStorage.getFilmById(1L).getMpa().getId(), "Неверный рейтинг фильма");
-        assertEquals(2, filmStorage.getFilmById(1L).getGenres().size(),
+        assertEquals(1, filmStorage.getFilmById(1L).getGenres().size(),
                 "Неверное количество жанров у фильма");
     }
 

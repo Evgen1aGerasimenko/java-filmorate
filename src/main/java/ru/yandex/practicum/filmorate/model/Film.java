@@ -25,6 +25,6 @@ public class Film {
     @Min(1)
     private int duration;
     private Set<Long> likes = new HashSet<>();
-    private Set<Genres> genres = new HashSet<>();
+    private HashSet<Genres> genres = new HashSet<>();
     private Mpa mpa;
 }
