@@ -7,28 +7,41 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
+import ru.yandex.practicum.filmorate.model.Genres;
+import ru.yandex.practicum.filmorate.repository.FilmRepository;
+import ru.yandex.practicum.filmorate.repository.GenresRepository;
+import ru.yandex.practicum.filmorate.repository.MpaRepository;
+import ru.yandex.practicum.filmorate.repository.UserRepository;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class InMemoryFilmService implements FilmService {
-    private final FilmStorage filmStorage;
+public class DbFilmService implements FilmService {
+    private final FilmRepository filmRepository;
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
-    private final UserStorage userStorage;
+    private final UserRepository userRepository;
+    private final MpaRepository mpaRepository;
+    private final GenresRepository genresRepository;
 
     @Override
     public List<Film> getFilms() {
         log.info("Получен запрос для получения списка фильмов");
-        return filmStorage.getFilms();
+        return filmRepository.getFilms();
     }
 
     @Override
     public Film createFilm(Film film) {
         log.info("Получен запрос для добавления нового фильма" + film);
-        return filmStorage.createFilm(film);
+        if (film.getGenres() != null) {
+            for (Genres genres : film.getGenres()) {
+                if (genresRepository.getGenreById(genres.getId()) == null) {
+                    throw new ValidationException("Пользователь не найден");
+                }
+            }
+        }
+        mpaRepository.getMpaById(film.getMpa().getId());
+        return filmRepository.createFilm(film);
     }
 
     @Override
@@ -38,32 +51,37 @@ public class InMemoryFilmService implements FilmService {
         if (filmId == null) {
             throw new ValidationException("Ошибка изменения данных фильма. Не задан идентификатор фильма для обновления.");
         }
-        filmStorage.getFilmId(film.getId());
-        return filmStorage.updateFilm(film);
+        filmRepository.getFilmById(film.getId());
+        return filmRepository.updateFilm(film);
     }
 
     @Override
     public void addLike(Long id, Long userId) {
         log.info("Получен запрос для добавления лайка");
-        userStorage.getUserId(userId);
-        Film film = filmStorage.getFilmId(id);
+        userRepository.getUserById(userId);
+        Film film = filmRepository.getFilmById(id);
         if (film.getLikes().contains(userId)) {
             throw new ValidationException("Пользователь уже поставил лайк этому фильму");
         }
-        filmStorage.addLike(id, userId);
+        filmRepository.addLike(id, userId);
     }
 
     @Override
     public void deleteLike(Long id, Long userId) {
         log.info("Получен запрос для удаления лайка");
-        userStorage.getUserId(userId);
-        filmStorage.deleteLike(id, userId);
+        userRepository.getUserById(userId);
+        filmRepository.deleteLike(id, userId);
     }
 
     @Override
-    public List<Film> getTheTopFilms(Long count) {
+    public List<Film> getTheTopFilms(int count) {
         log.info("Получен запрос на получение списка лучших фильмов");
-        return filmStorage.getTheTopFilms(count);
+        return filmRepository.getTheTopFilms(count);
+    }
+
+    @Override
+    public Film getFilmById(Long id) {
+        log.info("Получен запрос на получение фильма");
+        return filmRepository.getFilmById(id);
     }
 }
-
